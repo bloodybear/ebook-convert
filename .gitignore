@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# ide
+.idea
+
+# docker data
+docker/*/data/
+
+# ignore temporally
+tests/

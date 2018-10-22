@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}Convert document{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+        <div>
+            <label for="file">File :</label>
+            <input name="file" id="file" type="file" required>
+        </div>
+        <div>
+            <label>Convert to :</label>
+            <input name="ext" id="ext_pdf" type="radio" value=".pdf" checked><label for="ext_pdf">pdf</label>
+            <input name="ext" id="ext_epub" type="radio" value=".epub"><label for="ext_epub">epub</label>
+        </div>
+        <div>
+            <input type="submit" value="Convert">
+        </div>
+    </form>
+{% endblock %}

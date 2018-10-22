@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}Convert document{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <div id="app">
+        <p>
+            <template v-if="status === 'FAILED'">Failed</template>
+            <template v-else-if="status === 'QUEUED'">Please wait[[ dot ]]</template>
+            <template v-else-if="status === 'STARTED'">Now Converting[[ dot ]]</template>
+            <template v-else-if="status === 'COMPLETED'"><a v-bind:href="url">[[ filename ]]</a></template>
+            <template v-else></template>
+        </p>
+    </div>
+    <p><a href="{{ url_for('convert.index') }}">Convert more</a></p>
+{% endblock %}
+
+{% block js %}
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                status: "",
+                url: "",
+                filename: "",
+                dot: ""
+            },
+            delimiters: ['[[', ']]'],
+            created: function () {
+                this.checkStatus();
+                this.dotTimer = setInterval(this.dotRotate, 250);
+                this.statusTimer = setInterval(this.checkStatus, 1000);
+            },
+            methods: {
+                checkStatus: function () {
+                    var url = '{{ url_for('convert.status') }}';
+                    var task_id = {{ task_id }};
+                    axios.post(url, {
+                        task_id: task_id
+                    }).then(function (response) {
+                        data = response.data;
+                        app.status = data.status;
+                        app.url = data.url;
+                        app.filename = data.filename;
+                        if (data.status == 'COMPLETED' || data.status == 'FAILED') {
+                            clearInterval(app.dotTimer);
+                            clearInterval(app.statusTimer);
+                        }
+                    });
+                },
+                dotRotate: function () {
+                    if (app.dot.length == 3) {
+                        app.dot = "";
+                        return;
+                    }
+                    app.dot += ".";
+                }
+            }
+        })
+    </script>
+{% endblock %}
